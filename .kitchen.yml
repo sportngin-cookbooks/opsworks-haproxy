@@ -15,6 +15,30 @@ provisioner:
   name: chef_solo
   attributes:
     test_kitchen: true
+    opsworks:
+      layers:
+        utility:
+          name: "Utility"
+          instances:
+            util-01:
+              private_ip: "127.0.0.0"
+              instance_type: "t2.small"
+        rails-app:
+          name: "Rails App"
+          instances:
+            app-01:
+              private_ip: "127.0.0.1"
+              instance_type: "c3.8xlarge"
+              elastic_ip: "127.0.0.1"
+            app-02:
+              private_ip: "127.0.0.2"
+              instance_type: "c3.8xlarge"
+              elastic_ip: null
+            app-03:
+              private_ip: "127.0.0.3"
+              instance_type: "t2.small"
+              elastic_ip: null
+
 platforms:
   - name: amazon-2014.09
     driver_plugin: ec2

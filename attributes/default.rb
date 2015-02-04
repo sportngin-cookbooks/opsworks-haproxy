@@ -1,0 +1,1 @@
+default[:haproxy][:backends] = OpsworksHaproxy::backends(node)

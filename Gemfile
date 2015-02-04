@@ -8,6 +8,7 @@ end
 group :development, :test do
   gem 'berkshelf', '~>2'
   gem 'test-kitchen'
+  gem 'rspec'
   gem 'serverspec'
   gem 'kitchen-ec2'
   gem 'foodcritic'
