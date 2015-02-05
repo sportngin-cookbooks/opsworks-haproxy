@@ -1,0 +1,14 @@
+env:
+  global:
+  - EC2_SSH_KEY_PATH: ec2.pem
+  - secure: jthpAUsdEDBNCQW5i0Lt0RVmv+vykzAc9Wg8hec9s3TSWomvnoXNzSyTwR/NolztvLDroE07H+SFDTLA583xSGvsh7dUUqqcKmYUqWd+KgoSmoi3jERIf+9yT55yl2jId70D/v2vnlvVLClFawNigl4g5vuKoxM4SAmt+ycMyDY=
+  - secure: EwXN818XXk1QOcptdDZGVXUOfWu9BL8ANui82hpFfRc7RIOzWZ4JQRI6bz2smrTL+mM50UdN2Xa78rRBPBOBGJN2A04SwWK+JJZLolFL/yy7yANH+qmCFt6Gl1WxiN2En1m9z1VdTYGX5DxbYyMdMWvNPHOHoE2mfnU+ZDT7hfQ=
+  - secure: OWfZ/Bcie4FvJS6yghS06zd3XJONH4HJDkDZ2IB9pKthslmc87uaDdgC4mvnxnDizGEWQfge31ZpNzaI0e01sVRF46CK6BTtRBYXvcQaQfvz3sRWY3II2iSmw7/PcAUAQYk87mJo5Evgix6bv5cV3kBsN0ElBdiGY7VonfraQow=
+before_install:
+- openssl aes-256-cbc -K $encrypted_ea441a96919f_key -iv $encrypted_ea441a96919f_iv
+  -in id_rsa_kitchen_ec2.enc -out ec2.pem -d
+- chmod 600 ec2.pem
+script: bundle exec rake
+language: ruby
+bundler_args: --without development --deployment --jobs=3 --retry=3
+cache: bundler

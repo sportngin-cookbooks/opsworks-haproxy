@@ -1,0 +1,91 @@
+global
+  log 127.0.0.1   local0
+  log 127.0.0.1   local1 notice
+  #log loghost    local0 info
+  maxconn <%= node[:haproxy][:global_max_connections] %>
+  #debug
+  #quiet
+  user haproxy
+  group haproxy
+  stats socket /tmp/haproxy.sock
+<% @custom_config[:global].each do |name, value| %>
+  <%= "#{name} #{value}" unless value.nil? %>
+<% end %>
+
+defaults
+  log             global
+  mode            http
+  option          httplog
+  option          dontlognull
+  retries         <%= node[:haproxy][:retries] %>
+  option          redispatch
+  maxconn        <%= node[:haproxy][:default_max_connections] %>
+  timeout client <%= node[:haproxy][:client_timeout] %>             # Client and server timeout must match the longest
+  timeout server <%= node[:haproxy][:server_timeout] %>             # time we may wait for a response from the server.
+  timeout queue  <%= node[:haproxy][:queue_timeout] %>              # Don't queue requests too long if saturated.
+  timeout connect <%= node[:haproxy][:connect_timeout] %>           # There's no reason to change this one.
+  timeout http-request <%= node[:haproxy][:http_request_timeout] %>	# A complete request may never take that long.
+  option          httpclose                                         # disable keepalive (HAProxy does not yet support the HTTP keep-alive mode)
+  option          abortonclose                                      # enable early dropping of aborted requests from pending queue
+  option          httpchk                                           # enable HTTP protocol to check on servers health
+<% if node[:haproxy][:enable_stats] -%>
+  stats auth <%= node[:haproxy][:stats_user] %>:<%= node[:haproxy][:stats_password] %>
+  stats uri <%= node[:haproxy][:stats_url] %>
+<% end -%>
+<% @custom_config[:defaults].each do |name, value| %>
+  <%= "#{name} #{value}" unless value.nil? %>
+<% end %>
+
+<% unless @backends.empty? -%>
+backend app_servers
+  balance <%= node[:haproxy][:balance] %>
+  option redispatch
+  option httpclose
+  option forwardfor
+  option httpchk <%= node[:haproxy][:health_check_method] %> <%= node[:haproxy][:health_check_url] %>
+
+  <% @custom_config[:backend].each do |name, value| %>
+  <%= "#{name} #{value}" unless value.nil? %>
+  <% end %>
+
+  default-server <%= OpsworksHaproxy::default_server_params(node) %>
+  <% @backends.each do |name, attrs| -%>
+  server <%= "#{name} #{attrs['private_ip']}:#{node[:haproxy][:backend_port]} check weight #{attrs[:weight]}" %>
+  <% end -%>
+<% end -%>
+
+<% unless @backends.empty? -%>
+backend app_servers_ssl
+  mode tcp
+  balance <%= node[:haproxy][:balance] %>
+  option redispatch
+  option httpchk <%= node[:haproxy][:health_check_method] %> <%= node[:haproxy][:health_check_url] %>
+
+  <% @custom_config[:backend_ssl].each do |name, value| %>
+  <%= "#{name} #{value}" unless value.nil? %>
+  <% end %>
+
+  default-server <%= OpsworksHaproxy::default_server_params(node) %>
+  <% @backends.each do |name, attrs| -%>
+  server <%= "#{name} #{attrs['private_ip']}:#{node[:haproxy][:backend_ssl_port]} check weight #{attrs[:weight]}" %>
+  <% end -%>
+<% end -%>
+
+frontend http-in
+  bind :80
+<% @custom_config[:frontend].each do |name, value| %>
+  <%= "#{name} #{value}" unless value.nil? %>
+<% end %>
+<% unless @backends.empty? -%>
+  default_backend app_servers
+<% end -%>
+
+frontend https-in
+  mode tcp
+  bind :443
+<% @custom_config[:frontend_ssl].each do |name, value| %>
+  <%= "#{name} #{value}" unless value.nil? %>
+<% end %>
+<% unless @backends.empty? -%>
+  default_backend app_servers_ssl
+<% end -%>
