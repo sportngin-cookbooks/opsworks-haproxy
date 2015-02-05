@@ -6,7 +6,8 @@ template '/etc/haproxy/haproxy.cfg' do
   group 'root'
   mode 0644
   variables({
-                :backends => OpsworksHaproxy::calculate_weights(node[:haproxy][:backends])
+                :backends => OpsworksHaproxy::calculate_weights(node[:haproxy][:backends]),
+                :custom_config => node[:haproxy][:custom_config]
             })
   notifies :reload, 'service[haproxy]'
 end
