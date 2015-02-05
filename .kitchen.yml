@@ -15,6 +15,20 @@ provisioner:
   name: chef_solo
   attributes:
     test_kitchen: true
+    haproxy:
+      custom_config:
+        global:
+          description: Global tacos.
+        defaults:
+          http-check: disable-on-404
+        backend:
+          reqadd: X-Backend:1
+        backend_ssl:
+          reqadd: X-Backend-SSL:1
+        frontend:
+          reqadd: X-Frontend:1
+        frontend_ssl:
+          reqadd: X-Frontend-SSL:1
     opsworks:
       layers:
         utility:
