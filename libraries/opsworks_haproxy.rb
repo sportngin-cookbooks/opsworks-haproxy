@@ -35,4 +35,14 @@ module OpsworksHaproxy
     end
     mutable_backends
   end
+
+  def self.default_server_params(node)
+    params = []
+    params << "port #{node[:haproxy][:check_port]}"
+    params << "inter #{node[:haproxy][:check_interval]}"
+    params << "fastinter #{node[:haproxy][:fast_check_interval]}"
+    params << "fall #{node[:haproxy][:server_fall]}"
+    params.join(' ')
+  end
+
 end

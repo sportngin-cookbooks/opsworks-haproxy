@@ -52,25 +52,31 @@ defaults
   http-check disable-on-404
 
 backend app_servers
-  balance leastconn
+  balance roundrobin
   option redispatch
   option httpclose
   option forwardfor
-  option httpchk /okcomputer
+  option httpchk OPTIONS /
+
   reqadd X-Backend:1
-  server app-01 127.0.0.1:81 check port 81 inter 5000 fastinter 1000 fall 1 weight 192
-  server app-02 127.0.0.2:81 check port 81 inter 5000 fastinter 1000 fall 1 weight 256
-  server app-03 127.0.0.3:81 check port 81 inter 5000 fastinter 1000 fall 1 weight 8
+
+  default-server port 81 inter 5s fastinter 1s fall 1
+  server app-01 127.0.0.1:81 check weight 192
+  server app-02 127.0.0.2:81 check weight 256
+  server app-03 127.0.0.3:81 check weight 8
 
 backend app_servers_ssl
   mode tcp
-  balance leastconn
+  balance roundrobin
   option redispatch
-  option httpchk /okcomputer
+  option httpchk OPTIONS /
+
   reqadd X-Backend-SSL:1
-  server app-01 127.0.0.1:444 check port 81 inter 5000 fastinter 1000 fall 1 weight 192
-  server app-02 127.0.0.2:444 check port 81 inter 5000 fastinter 1000 fall 1 weight 256
-  server app-03 127.0.0.3:444 check port 81 inter 5000 fastinter 1000 fall 1 weight 8
+
+  default-server port 81 inter 5s fastinter 1s fall 1
+  server app-01 127.0.0.1:444 check weight 192
+  server app-02 127.0.0.2:444 check weight 256
+  server app-03 127.0.0.3:444 check weight 8
 
 frontend http-in
   bind :80
