@@ -1,4 +1,4 @@
-name             'opsworks-haproxy'
+name             'haproxy'
 maintainer       'Sport Ngin'
 maintainer_email 'platform-ops@sportngin.com'
 license          'MIT'
