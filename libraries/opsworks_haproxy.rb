@@ -5,7 +5,8 @@ module OpsworksHaproxy
     node[:opsworks][:layers].each do |layer, attributes|
       instances.merge!(attributes[:instances]) if layer.to_s.include?("app")
     end
-    instances
+    set_default_instance(node[:opsworks][:instance], instances)
+    calculate_weights(instances)
   end
 
   def self.get_max_cpus(backends)
@@ -34,6 +35,12 @@ module OpsworksHaproxy
       mutable_backends[name] = attrs.to_hash
     end
     mutable_backends
+  end
+
+  def self.set_default_instance(current_instance, instances)
+    if instances.empty?
+      instances[current_instance[:hostname]] = current_instance.to_hash
+    end
   end
 
   def self.default_server_params(node)

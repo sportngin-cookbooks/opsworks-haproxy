@@ -71,5 +71,5 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[opsworks-haproxy::default]
+      - recipe[haproxy::default]
     attributes:
