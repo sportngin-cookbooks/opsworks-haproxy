@@ -1,2 +1,2 @@
 deploy_branch: master
-github_repo: sportngin-cookbooks/opsworks-haproxy
+github_repo: moovel/opsworks-haproxy

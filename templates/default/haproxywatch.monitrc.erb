@@ -1,0 +1,8 @@
+check host <%= node[:stack][:primary_ip] %> with address <%= node[:stack][:primary_ip] %>
+    if failed
+        port 80
+        protocol HTTP
+        request /
+        timeout 30 seconds
+        for 3 cycles
+        then exec "/etc/failtome.sh

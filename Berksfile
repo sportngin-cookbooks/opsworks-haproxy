@@ -1,5 +1,6 @@
-site :opscode
+source 'https://supermarket.chef.io'
 
+# Although the defined cookbooks go to the old 11.10 Githubs.
 def opsworks_cookbook(name, branch='release-chef-11.4')
   cookbook name, github: 'aws/opsworks-cookbooks', branch: branch, rel: name
 end

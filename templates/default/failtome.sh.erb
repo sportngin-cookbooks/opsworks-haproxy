@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Check current instance IP externally
+OUT=$( curl -qSfsw '\n' http://checkip.amazonaws.com ) 2>/dev/null
+RET=$?
+
+# Check that current IP isn't target IP and that request didn't fail
+if [ "$RET" = '0' -a "$OUT" != '<%= node[:stack][:primary_ip] %>' ]; then
+
+ # Swap EIP
+ aws --region <%= node[:opsworks][:instance][:region] %> opsworks associate-elastic-ip \
+  --elastic-ip <%= node[:stack][:primary_ip] %> \
+  --instance-id <%= node[:opsworks][:instance][:id] %>
+
+ # Send notification
+ aws --region <%= node[:opsworks][:instance][:region] %> sns publish \
+  --topic-arn <%= node[:stack][:failover_topic] %> \
+  --subject "HAProxy failover notification" \
+  --message \
+  "Instance <%= node[:opsworks][:instance][:id] %> took over <%= node[:stack][:primary_ip] %>"
+
+fi
