@@ -319,7 +319,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  berkshelf (~> 2)
+  berkshelf (~> 3.2.0)
   chef (~> 11.10.4)
   foodcritic
   kitchen-ec2

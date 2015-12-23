@@ -16,3 +16,18 @@ execute "echo 'checking if HAProxy is not running - if so start it'" do
   not_if 'pgrep haproxy'
   notifies :start, 'service[haproxy]'
 end
+
+template '/etc/failtome.sh' do
+  source 'failtome.sh.erb'
+  owner 'root'
+  group 'root'
+  mode 0755
+end
+
+template '/etc/monit.d/haproxywatch.monitrc' do
+  source 'haproxywatch.monitrc.erb'
+  owner 'root'
+  group 'root'
+  mode 0440
+  notifies :reload, "service[monit]", :immediately
+end
